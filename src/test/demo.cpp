@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
     cv::distanceTransform(eigen2cv(binary), eigen2cv(grid_map.get("distance")),
                           CV_DIST_L2, CV_DIST_MASK_PRECISE);
     grid_map.get("distance") *= resolution;
-    grid_map.setFrameId("/map");
+    grid_map.setFrameId("map");
 //    cv::imwrite("/home/ljn/桌面/map1.png", eigen2cv(grid_map.get("obstacle")));
 
     // Set publishers.
@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
 
     // Markers initialization.
     ros_viz_tools::RosVizTools markers(nh, "markers");
-    std::string marker_frame_id = "/map";
+    std::string marker_frame_id = "map";
 
     // Loop.
     ros::Rate rate(30.0);
@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
 
         // Visualize reference path selected by mouse.
         visualization_msgs::Marker reference_marker =
-            markers.newSphereList(0.5, "reference point", id++, ros_viz_tools::RED, marker_frame_id);
+            markers.newSphereList(0.5, "/reference point", id++, ros_viz_tools::RED, marker_frame_id);
         for (size_t i = 0; i != reference_path_plot.size(); ++i) {
             geometry_msgs::Point p;
             p.x = reference_path_plot[i].x;
@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
         start_pose.orientation.z = start_quat.z();
         start_pose.orientation.w = start_quat.w();
         visualization_msgs::Marker start_marker =
-            markers.newArrow(scale, start_pose, "start point", id++, ros_viz_tools::CYAN, marker_frame_id);
+            markers.newArrow(scale, start_pose, "/start point", id++, ros_viz_tools::CYAN, marker_frame_id);
         markers.append(start_marker);
         geometry_msgs::Pose end_pose;
         end_pose.position.x = end_state.x;
@@ -184,7 +184,7 @@ int main(int argc, char **argv) {
         end_pose.orientation.z = end_quat.z();
         end_pose.orientation.w = end_quat.w();
         visualization_msgs::Marker end_marker =
-            markers.newArrow(scale, end_pose, "end point", id++, ros_viz_tools::CYAN, marker_frame_id);
+            markers.newArrow(scale, end_pose, "/end point", id++, ros_viz_tools::CYAN, marker_frame_id);
         markers.append(end_marker);
 
         // Calculate.
@@ -221,7 +221,7 @@ int main(int argc, char **argv) {
             path_color.b = 0.0;
         }
         visualization_msgs::Marker result_marker =
-            markers.newLineStrip(0.5, "optimized path", id++, path_color, marker_frame_id);
+            markers.newLineStrip(0.5, "/optimized path", id++, path_color, marker_frame_id);
         for (size_t i = 0; i != result_path.size(); ++i) {
             geometry_msgs::Point p;
             p.x = result_path[i].x;
@@ -237,7 +237,7 @@ int main(int argc, char **argv) {
 
         // Visualize result path.
         visualization_msgs::Marker result_boxes_marker =
-            markers.newLineStrip(0.15, "optimized path by boxes", id++, ros_viz_tools::BLACK, marker_frame_id);
+            markers.newLineStrip(0.15, "/optimized path by boxes", id++, ros_viz_tools::BLACK, marker_frame_id);
         for (size_t i = 0; i != result_path_by_boxes.size(); ++i) {
             geometry_msgs::Point p;
             p.x = result_path_by_boxes[i].x;
@@ -250,7 +250,7 @@ int main(int argc, char **argv) {
         // Visualize smoothed reference path.
         visualization_msgs::Marker smoothed_reference_marker =
             markers.newLineStrip(0.07,
-                                 "smoothed reference path",
+                                 "/smoothed reference path",
                                  id++,
                                  ros_viz_tools::YELLOW,
                                  marker_frame_id);
@@ -265,7 +265,7 @@ int main(int argc, char **argv) {
         ros_viz_tools::ColorRGBA vehicle_color = ros_viz_tools::GRAY;
         vehicle_color.a = 0.5;
         visualization_msgs::Marker vehicle_geometry_marker =
-            markers.newLineList(0.03, "vehicle", id++, vehicle_color, marker_frame_id);
+            markers.newLineList(0.03, "/vehicle", id++, vehicle_color, marker_frame_id);
         // Visualize vehicle geometry.
         static const double length{FLAGS_car_length};
         static const double width{FLAGS_car_width};
@@ -313,7 +313,7 @@ int main(int argc, char **argv) {
         markers.append(vehicle_geometry_marker);
 
         visualization_msgs::Marker block_state_marker =
-            markers.newSphereList(0.45, "block state", id++, ros_viz_tools::PINK, marker_frame_id);
+            markers.newSphereList(0.45, "/block state", id++, ros_viz_tools::PINK, marker_frame_id);
         static std::vector<double> len_vec{FLAGS_rear_length, 0.0, FLAGS_front_length};
         auto block_ptr = reference_path_opt.isBlocked();
         if (block_ptr) {
@@ -330,7 +330,7 @@ int main(int argc, char **argv) {
 
         // Plot bounds.
         visualization_msgs::Marker front_bounds_marker =
-            markers.newSphereList(0.25, "front bounds", id++, ros_viz_tools::LIGHT_BLUE, marker_frame_id);
+            markers.newSphereList(0.25, "/front bounds", id++, ros_viz_tools::LIGHT_BLUE, marker_frame_id);
         for (const auto &bound : reference_path_opt.getBounds()) {
             const auto &front_bound = bound.front;
             geometry_msgs::Point p;
@@ -345,7 +345,7 @@ int main(int argc, char **argv) {
         markers.append(front_bounds_marker);
 
         visualization_msgs::Marker rear_bounds_marker =
-            markers.newSphereList(0.25, "rear bounds", id++, ros_viz_tools::LIME_GREEN, marker_frame_id);
+            markers.newSphereList(0.25, "/rear bounds", id++, ros_viz_tools::LIME_GREEN, marker_frame_id);
         for (const auto &bound : reference_path_opt.getBounds()) {
             const auto &rear_bound = bound.rear;
             geometry_msgs::Point p;
@@ -360,7 +360,7 @@ int main(int argc, char **argv) {
         markers.append(rear_bounds_marker);
 
         visualization_msgs::Marker center_bounds_marker =
-            markers.newSphereList(0.25, "center bounds", id++, ros_viz_tools::CYAN, marker_frame_id);
+            markers.newSphereList(0.25, "/个center bounds", id++, ros_viz_tools::CYAN, marker_frame_id);
         for (const auto &bound : reference_path_opt.getBounds()) {
             const auto &center_bounds = bound.center;
             geometry_msgs::Point p;
